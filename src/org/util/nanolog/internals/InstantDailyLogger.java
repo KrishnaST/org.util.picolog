@@ -5,8 +5,6 @@ import java.io.Writer;
 
 import org.util.nanolog.LogWriter;
 import org.util.nanolog.Logger;
-import org.util.nanolog.LoggingConfig;
-import org.util.nanolog.LoggingUtil;
 
 public final class InstantDailyLogger extends Logger implements DailyLogger {
 
@@ -22,7 +20,6 @@ public final class InstantDailyLogger extends Logger implements DailyLogger {
 	@Override
 	public final void write(String s) {
 		try {
-			if(cstatus && LoggingConfig.logConsole) writeConsole(s);
 			writer.write(s);
 			writer.flush();
 		} catch (IOException e) {
@@ -40,6 +37,7 @@ public final class InstantDailyLogger extends Logger implements DailyLogger {
 	
 	@Override
 	public final void changeDate() {
-		this.writer = LoggingUtil.getDatedWriter(this.name);
+		
+		//this.writer = LoggingUtil.getDatedWriter(this.name);
 	}
 }

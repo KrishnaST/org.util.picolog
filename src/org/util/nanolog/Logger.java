@@ -11,9 +11,12 @@ import java.lang.StackWalker.StackFrame;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.util.nanolog.internals.BufferedDailyLogger;
 import org.util.nanolog.internals.BufferedLogger;
+import org.util.nanolog.internals.ConfigLoader;
 import org.util.nanolog.internals.ConsoleLogger;
 import org.util.nanolog.internals.InstantDailyLogger;
 import org.util.nanolog.internals.InstantLogger;
@@ -25,17 +28,14 @@ public abstract class Logger implements AutoCloseable {
 	private static final Writer				writer		= new FileWriter(FileDescriptor.out);
 	private static final ConsoleLogger		CONSOLE		= new ConsoleLogger();
 
-	private static final boolean meta	= LoggingConfig.logMeta;
-	
 	private static final int	ERROR	= Level.ERROR.value;
 	private static final int	WARN	= Level.WARN.value;
 	private static final int	INFO	= Level.INFO.value;
 	private static final int	DEBUG	= Level.DEBUG.value;
 	private static final int	TRACE	= Level.TRACE.value;
 
-	private final int	level	= LoggingConfig.level.value+1;
+	private final int	level	= ConfigLoader.getLevel().value;
 	protected boolean	status	= true;
-	protected boolean	cstatus	= LoggingConfig.logConsole;
 
 	protected abstract void write(String s);
 
@@ -49,23 +49,19 @@ public abstract class Logger implements AutoCloseable {
 	}
 
 	public final void error(final String s) {
-		if (meta) write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
-		else write(ERROR, this, s);
+		write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void error(final String t, final String v) {
-		if (meta) write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
-		else write(ERROR, this, t, v);
+		write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void error(final Object o) {
-		if (meta) write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
-		else write(ERROR, this, String.valueOf(o));
+		write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void error(final Exception e) {
-		if (meta) write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
-		else write(ERROR, this, stackTraceToString(e));
+		write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 	
 	
@@ -73,69 +69,57 @@ public abstract class Logger implements AutoCloseable {
 	
 	
 	public final void warn(final String s) {
-		if (meta) write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
-		else write(WARN, this, s);
+		write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void warn(final String t, final String v) {
-		if (meta) write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
-		else write(WARN, this, t, v);
+		write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void warn(final Object o) {
-		if (meta) write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
-		else write(WARN, this, String.valueOf(o));
+		write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void warn(final Exception e) {
-		if (meta) write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
-		else write(WARN, this, stackTraceToString(e));
+		write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 	
 	
 	
 	
 	public final void info(final String s) {
-		if (meta) write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
-		else write(INFO, this, s);
+		write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void info(final String t, final String v) {
-		if (meta) write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
-		else write(INFO, this, t, v);
+		write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void info(final Object o) {
-		if (meta) write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
-		else write(INFO, this, String.valueOf(o));
+		write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void info(final Exception e) {
-		if (meta) write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
-		else write(INFO, this, stackTraceToString(e));
+		write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 	
 	
 	
 	
 	public final void debug(final String s) {
-		if (meta) write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
-		else write(DEBUG, this, s);
+		write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void debug(final String t, final String v) {
-		if (meta) write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
-		else write(DEBUG, this, t, v);
+		write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void debug(final Object o) {
-		if (meta) write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
-		else write(DEBUG, this, String.valueOf(o));
+		write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void debug(final Exception e) {
-		if (meta) write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
-		else write(DEBUG, this, stackTraceToString(e));
+		write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 	
 	
@@ -143,23 +127,19 @@ public abstract class Logger implements AutoCloseable {
 	
 	
 	public final void trace(final String s) {
-		if (meta) write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
-		else write(TRACE, this, s);
+		write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void trace(final String t, final String v) {
-		if (meta) write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
-		else write(TRACE, this, t, v);
+		write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void trace(final Object o) {
-		if (meta) write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
-		else write(TRACE, this, String.valueOf(o));
+		write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void trace(final Exception e) {
-		if (meta) write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
-		else write(TRACE, this, stackTraceToString(e));
+		write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 
 	private static final void write(final int level, final Logger logger, final StackFrame frame, final String s) {
@@ -175,16 +155,6 @@ public abstract class Logger implements AutoCloseable {
 		}
 	}
 
-	private static final void write(final int level, final Logger logger, final String s) {
-		try {
-			final StringBuilder sb = new StringBuilder(50);
-			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(s).append("\r\n");
-			String ssb = sb.toString();
-			logger.write(ssb);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	private static final void write(final int level, final Logger logger, final StackFrame frame, final String t, final String v) {
 		if(!logger.status || level < logger.level)
@@ -199,33 +169,19 @@ public abstract class Logger implements AutoCloseable {
 		}
 	}
 
-	private static final void write(final int level, final Logger logger, final String t, final String v) {
-		try {
-			final StringBuilder sb = new StringBuilder(50);
-			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(t).append(" : ").append(v).append("\r\n");
-			String ssb = sb.toString();
-			logger.write(ssb);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	
 	public final void activate(boolean status) {
 		this.status = status;
 	}
 
-	public final void activateConsole(boolean status) {
-		this.cstatus = status;
-	}
 
 	public void close() throws Exception {}
 
 	public static final Logger getLogger(LoggerType type, LogWriter logWriter) {
-		if (type == LoggerType.INSTANT && !logWriter.isIsdaily()) return new InstantLogger(logWriter);
-		else if (type == LoggerType.INSTANT && logWriter.isIsdaily()) return new InstantDailyLogger(logWriter);
-		else if (type == LoggerType.BUFFERED && !logWriter.isIsdaily()) return new BufferedLogger(logWriter);
-		else if (type == LoggerType.BUFFERED && logWriter.isIsdaily()) return new BufferedDailyLogger(logWriter);
+		if (type == LoggerType.INSTANT && !logWriter.isIsDaily()) return new InstantLogger(logWriter);
+		else if (type == LoggerType.INSTANT && logWriter.isIsDaily()) return new InstantDailyLogger(logWriter);
+		else if (type == LoggerType.BUFFERED && !logWriter.isIsDaily()) return new BufferedLogger(logWriter);
+		else if (type == LoggerType.BUFFERED && logWriter.isIsDaily()) return new BufferedDailyLogger(logWriter);
 		else return CONSOLE;
 	}
 
@@ -241,5 +197,13 @@ public abstract class Logger implements AutoCloseable {
 			return sw.toString();
 		} catch (Exception ex) {}
 		return "";
+	}
+	
+	public static final void scheduleDateChange(ScheduledExecutorService schedular) {
+		try {
+			schedular.scheduleAtFixedRate((ConsoleLogger) Logger.getConsole(), LoggingUtil.getEndOfDay(), 24 * 60 * 60, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

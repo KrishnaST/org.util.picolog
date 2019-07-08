@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.util.nanolog.LogWriter;
 import org.util.nanolog.Logger;
-import org.util.nanolog.LoggingConfig;
-import org.util.nanolog.LoggingUtil;
 
 public final class BufferedLogger extends Logger {
 
@@ -19,10 +17,6 @@ public final class BufferedLogger extends Logger {
 		this.writer = writer;
 	}
 	
-	public BufferedLogger(String name) {
-		this.writer = LoggingUtil.getWriter(name);
-	}
-	
 	public BufferedLogger(LogWriter logWriter) {
 		this.writer = logWriter.getWriter();
 	}
@@ -30,7 +24,6 @@ public final class BufferedLogger extends Logger {
 	@Override
 	public final void write(String s) {
 		if(super.status) list.add(s);
-		if(super.cstatus && LoggingConfig.logConsole) writeConsole(s);
 	}
 	
 	@Override

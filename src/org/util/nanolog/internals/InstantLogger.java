@@ -5,8 +5,6 @@ import java.io.Writer;
 
 import org.util.nanolog.LogWriter;
 import org.util.nanolog.Logger;
-import org.util.nanolog.LoggingConfig;
-import org.util.nanolog.LoggingUtil;
 
 public final class InstantLogger extends Logger {
 
@@ -16,10 +14,6 @@ public final class InstantLogger extends Logger {
 		this.writer = writer;
 	}
 	
-	public InstantLogger(String name) {
-		this.writer = LoggingUtil.getWriter(name);
-	}
-	
 	public InstantLogger(LogWriter logWriter) {
 		this.writer = logWriter.getWriter();
 	}
@@ -27,7 +21,6 @@ public final class InstantLogger extends Logger {
 	@Override
 	public final void write(String s) {
 		try {
-			if(cstatus && LoggingConfig.logConsole) writeConsole(s);
 			if(status) {
 				writer.write(s);
 				writer.flush();

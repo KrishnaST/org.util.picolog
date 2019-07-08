@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.util.nanolog.LogWriter;
 import org.util.nanolog.Logger;
-import org.util.nanolog.LoggingConfig;
 
 public final class BufferedDailyLogger extends Logger {
 	
@@ -23,7 +22,6 @@ public final class BufferedDailyLogger extends Logger {
 	@Override
 	public final void write(String s) {
 		if(super.status) list.add(s);
-		if(super.cstatus && LoggingConfig.logConsole) writeConsole(s);
 	}
 	
 	@Override

@@ -1,38 +1,44 @@
 package org.util.nanolog;
 
 import java.io.Writer;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-public class LogWriter {
+public final class LogWriter {
 
-	private final String name;
-	private final boolean isdaily;
+	protected static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	
+	public final String root;
+	public final String name;
+	public final boolean isDaily;
 	private String writerName;
 	private Writer writer;
 	
-	private LogWriter(String name, String writerName, Writer writer, boolean isdaily) {
+	private LogWriter(String root, String name, String writerName, Writer writer, boolean isDaily) {
+		this.root = getRoot(root);
 		this.name = name;
 		this.writerName = writerName;
 		this.writer = writer;
-		this.isdaily = isdaily;
+		this.isDaily = isDaily;
 	}
 	
-	public static final LogWriter getFileWriter(String name) {
-		String writerName = LoggingUtil.getWriterName(name);
-		return new LogWriter(name, writerName, LoggingUtil.getFileWriter(writerName), false);
+	public static final LogWriter getFileWriter(final String root, final String name) {
+		String writerName = getWriterName(root, name);
+		return new LogWriter(root, name, writerName, LoggingUtil.getFileWriter(writerName), false);
 	}
 	
-	public static final LogWriter getDailyFileWriter(String name) {
-		String writerName = LoggingUtil.getDatedWriterName(name);
-		return new LogWriter(name, writerName, LoggingUtil.getFileWriter(writerName), true);
+	public static final LogWriter getDailyFileWriter(final String root, String name) {
+		String writerName = getDatedWriterName(root, name);
+		return new LogWriter(root, name, writerName, LoggingUtil.getFileWriter(writerName), true);
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public Writer getWriter() {
-		if(isdaily) {
-			final String writerName = LoggingUtil.getDatedWriterName(this.name);
+	public final Writer getWriter() {
+		if(isDaily) {
+			final String writerName = getDatedWriterName(this.root, this.name);
 			if(writerName.equals(this.writerName)) return this.writer;
 			else {
 				this.writerName = writerName;
@@ -44,8 +50,25 @@ public class LogWriter {
 	}
 
 	
-	public boolean isIsdaily() {
-		return isdaily;
+	public boolean isIsDaily() {
+		return isDaily;
 	}
 	
+	
+	private static final String getRoot(final String root) {
+		if (root == null || "".equals(root)) return "";
+		else if (root.endsWith("/")) {
+			if(root.length() > 1) return root;
+			else return "";
+		}
+		else return root + "/";
+	}
+	
+	public static final String getWriterName(final String root, final String name) {
+		return "logs/" + root + name + ".log";
+	}
+
+	public static final String getDatedWriterName(final String root, final String name) {
+		return "logs/" + root + LocalDate.now().format(dateFormat) + "/" + name + ".log";
+	}
 }
