@@ -8,13 +8,13 @@ import org.util.nanolog.Logger;
 
 public final class InstantDailyLogger extends Logger implements DailyLogger {
 
-	protected final String	name;
 	private Writer writer;
+	private final LogWriter logWriter;
 	
 	public InstantDailyLogger(LogWriter logWriter) {
-		this.name = logWriter.getName();
+		this.logWriter = logWriter;
 		this.writer = logWriter.getWriter();
-		daily_loggers.put(name, this);
+		daily_loggers.put(logWriter.getName(), this);
 	}
 	
 	@Override
@@ -37,7 +37,6 @@ public final class InstantDailyLogger extends Logger implements DailyLogger {
 	
 	@Override
 	public final void changeDate() {
-		
-		//this.writer = LoggingUtil.getDatedWriter(this.name);
+		this.writer = logWriter.getWriter();
 	}
 }

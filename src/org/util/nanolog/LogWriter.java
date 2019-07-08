@@ -17,14 +17,13 @@ public final class LogWriter {
 	public final String name;
 	public final boolean isDaily;
 	private String writerName;
+	private LocalDate writerDate;
 	private Writer writer;
 	
-	private LogWriter(String root, String name, boolean isDaily) {
+	public LogWriter(String root, String name, boolean isDaily) {
 		this.root = getRoot(root);
 		this.name = name;
 		this.isDaily = isDaily;
-		this.writerName = isDaily ? getDatedWriterName(root, name) : getWriterName(root, name);
-		this.writer = getFileWriter(writerName);
 	}
 	
 	public final String getName() {
@@ -36,18 +35,10 @@ public final class LogWriter {
 	}
 	
 	
-	public static final LogWriter getLogWriter(final String root, final String name) {
-		return new LogWriter(root, name, false);
-	}
-	
-	public static final LogWriter getDailyLogWriter(final String root, String name) {
-		return new LogWriter(root, name, true);
-	}
-	
-	
 	public final Writer getWriter() {
 		if(isDaily) {
-			final String writerName = getDatedWriterName(this.root, this.name);
+			this.writerDate = LocalDate.now();
+			final String writerName = getDatedWriterName(this.root, this.name, writerDate);
 			if(writerName.equals(this.writerName)) return this.writer;
 			else {
 				this.writerName = writerName;
@@ -55,11 +46,24 @@ public final class LogWriter {
 				return this.writer;
 			}
 		}
-		else return this.writer;
+		else {
+			if(this.writer == null) {
+				this.writerName = getWriterName(this.root, this.name);
+				return this.writer = getFileWriter(this.writerName);
+			}
+			return this.writer;
+		}
 	}
 
+	public final void changeDate() {
+		if(isDaily) {
+			final String writerName = getDatedWriterName(this.root, this.name, writerDate.plusDays(1));
+			this.writerName = writerName;
+			this.writer = getFileWriter(this.writerName);
+		}
+	}
 	
-	public static final Writer getFileWriter(String name) {
+	private static final Writer getFileWriter(String name) {
 		try {
 			File file = new File(name);
 			if (!file.exists()) {
@@ -83,11 +87,11 @@ public final class LogWriter {
 		else return root + "/";
 	}
 	
-	public static final String getWriterName(final String root, final String name) {
+	private static final String getWriterName(final String root, final String name) {
 		return "logs/" + root + name + ".log";
 	}
 
-	public static final String getDatedWriterName(final String root, final String name) {
+	private static final String getDatedWriterName(final String root, final String name, final LocalDate date) {
 		return "logs/" + root + LocalDate.now().format(dateFormat) + "/" + name + ".log";
 	}
 }

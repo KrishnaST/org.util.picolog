@@ -14,10 +14,8 @@ public final class ConfigLoader {
 			if(in == null) {
 				System.err.println("Loading default logging properties\r\n"+
 						"LEVEL=TRACE\r\n" + 
-						"LOG_META=Y\r\n" + 
 						"LOG_CONSOLE=Y");
 				properties.put("LEVEL", "TRACE");
-				properties.put("LOG_META", "Y");
 				properties.put("LOG_CONSOLE", "Y");
 			}
 			else properties.load(in);
@@ -32,11 +30,6 @@ public final class ConfigLoader {
 		else if("DEBUG".equalsIgnoreCase(properties.getProperty("LEVEL"))) 	return Level.DEBUG;
 		else if("TRACE".equalsIgnoreCase(properties.getProperty("LEVEL"))) 	return Level.TRACE;
 		else return Level.TRACE;
-	}
-	
-	public static final boolean logMetaData() {
-		if(properties.getProperty("LOG_CONSOLE") == null) return true;
-		return "Y".equalsIgnoreCase(properties.getProperty("LOG_META"));
 	}
 	
 	public static final boolean logConsole() {
