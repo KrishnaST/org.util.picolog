@@ -30,13 +30,15 @@ public abstract class Logger implements AutoCloseable {
 	private static final Writer				writer		= new FileWriter(FileDescriptor.out);
 	private static final ConsoleLogger		CONSOLE		= new ConsoleLogger();
 
+	private static boolean logc = ConfigLoader.logConsole();
+	private static int lvl = ConfigLoader.getLevel().value;
+	
 	private static final int	ERROR	= Level.ERROR.value;
 	private static final int	WARN	= Level.WARN.value;
 	private static final int	INFO	= Level.INFO.value;
 	private static final int	DEBUG	= Level.DEBUG.value;
-	private static final int	TRACE	= Level.TRACE.value;
 
-	private final int	level	= ConfigLoader.getLevel().value;
+	private final int	level	= lvl;
 	protected boolean	status	= true;
 
 	protected abstract void write(String s);
@@ -51,19 +53,19 @@ public abstract class Logger implements AutoCloseable {
 	}
 
 	public final void error(final String s) {
-		write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if(status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void error(final String t, final String v) {
-		write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if(status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void error(final Object o) {
-		write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if(status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void error(final Exception e) {
-		write(ERROR, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if(status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 	
 	
@@ -71,57 +73,57 @@ public abstract class Logger implements AutoCloseable {
 	
 	
 	public final void warn(final String s) {
-		write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if(status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void warn(final String t, final String v) {
-		write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if(status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void warn(final Object o) {
-		write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if(status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void warn(final Exception e) {
-		write(WARN, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if(status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 	
 	
 	
 	
 	public final void info(final String s) {
-		write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if(status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void info(final String t, final String v) {
-		write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if(status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void info(final Object o) {
-		write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if(status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void info(final Exception e) {
-		write(INFO, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if(status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 	
 	
 	
 	
 	public final void debug(final String s) {
-		write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if(status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void debug(final String t, final String v) {
-		write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if(status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void debug(final Object o) {
-		write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if(status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void debug(final Exception e) {
-		write(DEBUG, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if(status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 	
 	
@@ -129,43 +131,43 @@ public abstract class Logger implements AutoCloseable {
 	
 	
 	public final void trace(final String s) {
-		write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if(status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
 	}
 	
 	public final void trace(final String t, final String v) {
-		write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if(status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
 	}
 	
 	public final void trace(final Object o) {
-		write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if(status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
 	}
 	
 	public final void trace(final Exception e) {
-		write(TRACE, this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if(status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 
-	private static final void write(final int level, final Logger logger, final StackFrame frame, final String s) {
-		if(!logger.status || level < logger.level)
+	private static final void write(final Logger logger, final StackFrame frame, final String s) {
 		try {
 			final StringBuilder sb = new StringBuilder(50);
 			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(frame.getDeclaringClass().getSimpleName()).append(".");
 			sb.append(frame.getMethodName()).append("(").append(frame.getLineNumber()).append(") ").append(s).append("\r\n");
 			String ssb = sb.toString();
 			logger.write(ssb);
+			if(logc) writeConsole(ssb);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 
-	private static final void write(final int level, final Logger logger, final StackFrame frame, final String t, final String v) {
-		if(!logger.status || level < logger.level)
+	private static final void write(final Logger logger, final StackFrame frame, final String t, final String v) {
 		try {
 			final StringBuilder sb = new StringBuilder(50);
 			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(frame.getDeclaringClass().getSimpleName()).append(".");
 			sb.append(frame.getMethodName()).append("(").append(frame.getLineNumber()).append(") ").append(t).append(" : ").append(v).append("\r\n");
 			String ssb = sb.toString();
 			logger.write(ssb);
+			if(logc) writeConsole(ssb);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
