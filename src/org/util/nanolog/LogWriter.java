@@ -61,6 +61,7 @@ public final class LogWriter {
 			this.writerName = writerName;
 			final Writer oldWriter = this.writer;
 			this.writer = getFileWriter(this.writerName);
+			try(oldWriter){} catch (Exception e) {}
 			return this.writer;
 			
 		}
