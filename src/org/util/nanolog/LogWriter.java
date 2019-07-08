@@ -55,12 +55,16 @@ public final class LogWriter {
 		}
 	}
 
-	public final void changeDate() {
+	public final Writer changeDate() {
 		if(isDaily) {
 			final String writerName = getDatedWriterName(this.root, this.name, writerDate.plusDays(1));
 			this.writerName = writerName;
+			final Writer oldWriter = this.writer;
 			this.writer = getFileWriter(this.writerName);
+			return this.writer;
+			
 		}
+		return this.writer;
 	}
 	
 	private static final Writer getFileWriter(String name) {
@@ -92,6 +96,6 @@ public final class LogWriter {
 	}
 
 	private static final String getDatedWriterName(final String root, final String name, final LocalDate date) {
-		return "logs/" + root + LocalDate.now().format(dateFormat) + "/" + name + ".log";
+		return "logs/" + root + date.format(dateFormat) + "/" + name + ".log";
 	}
 }

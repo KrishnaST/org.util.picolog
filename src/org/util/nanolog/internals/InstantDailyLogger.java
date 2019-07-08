@@ -37,6 +37,8 @@ public final class InstantDailyLogger extends Logger implements DailyLogger {
 	
 	@Override
 	public final void changeDate() {
-		this.writer = logWriter.getWriter();
+		System.out.println("changing log date");
+		this.writer = logWriter.changeDate();
+		System.out.println("changing log date changed.");
 	}
 }
