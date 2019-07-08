@@ -10,6 +10,8 @@ import java.lang.StackWalker.Option;
 import java.lang.StackWalker.StackFrame;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -201,9 +203,20 @@ public abstract class Logger implements AutoCloseable {
 	
 	public static final void scheduleDateChange(ScheduledExecutorService schedular) {
 		try {
-			schedular.scheduleAtFixedRate((ConsoleLogger) Logger.getConsole(), LoggingUtil.getEndOfDay(), 24 * 60 * 60, TimeUnit.SECONDS);
+			schedular.scheduleAtFixedRate((ConsoleLogger) Logger.getConsole(), getEndOfDay(), 24 * 60 * 60, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static final long getEndOfDay() {
+		Date date = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, cal.getMaximum(Calendar.HOUR_OF_DAY));
+		cal.set(Calendar.MINUTE, cal.getMaximum(Calendar.MINUTE));
+		cal.set(Calendar.SECOND, cal.getMaximum(Calendar.SECOND));
+		cal.set(Calendar.MILLISECOND, cal.getMaximum(Calendar.MILLISECOND));
+		return (cal.getTime().getTime() - date.getTime()) / 1000;
 	}
 }

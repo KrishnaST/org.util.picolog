@@ -1,8 +1,13 @@
 package org.util.nanolog;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
+import org.util.nanolog.internals.NullWriter;
 
 public final class LogWriter {
 
@@ -14,27 +19,31 @@ public final class LogWriter {
 	private String writerName;
 	private Writer writer;
 	
-	private LogWriter(String root, String name, String writerName, Writer writer, boolean isDaily) {
+	private LogWriter(String root, String name, boolean isDaily) {
 		this.root = getRoot(root);
 		this.name = name;
-		this.writerName = writerName;
-		this.writer = writer;
 		this.isDaily = isDaily;
+		this.writerName = isDaily ? getDatedWriterName(root, name) : getWriterName(root, name);
+		this.writer = getFileWriter(writerName);
 	}
 	
-	public static final LogWriter getFileWriter(final String root, final String name) {
-		String writerName = getWriterName(root, name);
-		return new LogWriter(root, name, writerName, LoggingUtil.getFileWriter(writerName), false);
-	}
-	
-	public static final LogWriter getDailyFileWriter(final String root, String name) {
-		String writerName = getDatedWriterName(root, name);
-		return new LogWriter(root, name, writerName, LoggingUtil.getFileWriter(writerName), true);
-	}
-	
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
+	
+	public final boolean isIsDaily() {
+		return isDaily;
+	}
+	
+	
+	public static final LogWriter getLogWriter(final String root, final String name) {
+		return new LogWriter(root, name, false);
+	}
+	
+	public static final LogWriter getDailyLogWriter(final String root, String name) {
+		return new LogWriter(root, name, true);
+	}
+	
 	
 	public final Writer getWriter() {
 		if(isDaily) {
@@ -42,7 +51,7 @@ public final class LogWriter {
 			if(writerName.equals(this.writerName)) return this.writer;
 			else {
 				this.writerName = writerName;
-				this.writer = LoggingUtil.getFileWriter(this.writerName);
+				this.writer = getFileWriter(this.writerName);
 				return this.writer;
 			}
 		}
@@ -50,8 +59,18 @@ public final class LogWriter {
 	}
 
 	
-	public boolean isIsDaily() {
-		return isDaily;
+	public static final Writer getFileWriter(String name) {
+		try {
+			File file = new File(name);
+			if (!file.exists()) {
+				file.getParentFile().mkdirs();
+				file.createNewFile();
+			}
+			return new FileWriter(file, true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return NullWriter.getInstance();
 	}
 	
 	
