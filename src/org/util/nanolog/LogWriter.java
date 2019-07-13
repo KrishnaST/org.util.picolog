@@ -56,6 +56,7 @@ public final class LogWriter {
 	}
 
 	public final Writer changeDate() {
+		Logger.getConsole().trace("*****************changing ddate.");
 		if(isDaily) {
 			final String writerName = getDatedWriterName(this.root, this.name, writerDate.plusDays(1));
 			this.writerName = writerName;

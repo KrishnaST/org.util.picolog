@@ -28,7 +28,7 @@ public final class BufferedDailyLogger extends Logger {
 		final StringBuilder sb = new StringBuilder(2000);
 		list.forEach(s-> sb.append(s));
 		final String s = sb.toString();
-		try(writer){
+		try{
 			synchronized (writer) {
 				writer.write(s);
 				writer.flush();

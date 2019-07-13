@@ -128,7 +128,9 @@ public abstract class Logger implements AutoCloseable {
 	
 	
 	
-	
+	public final void traceback(final String s) {
+		write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
+	}
 	
 	public final void trace(final String s) {
 		if(status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
