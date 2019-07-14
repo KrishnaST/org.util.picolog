@@ -279,6 +279,10 @@ public abstract class Logger implements AutoCloseable {
 		Logger.logc = status;
 	}
 	
+	public static final boolean getConsoleStatus() {
+		return Logger.logc;
+	}
+	
 	public void close() throws Exception {}
 
 	public static final Logger getLogger(LoggerType type, LogWriter logWriter) {
