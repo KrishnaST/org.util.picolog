@@ -57,8 +57,12 @@ public abstract class Logger implements AutoCloseable {
 		write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
 
-	public final void error(final Supplier<Object> s) {
-		write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+	public final void error(final Supplier<?> s) {
+		write(this, sw.walk(f -> f.skip(1).findFirst().get()), s.get().toString());
+	}
+	
+	public final void error(final String t, final Supplier<?> v) {
+		write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v.get().toString());
 	}
 
 	public final void error(final String s) {
@@ -77,12 +81,19 @@ public abstract class Logger implements AutoCloseable {
 		if (status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 
+	
+	
+	
 	public final void warnback(final String s) {
 		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
 
-	public final void warn(final Supplier<Object> s) {
-		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+	public final void warn(final Supplier<?> s) {
+		if (status && level > ERROR)write(this, sw.walk(f -> f.skip(1).findFirst().get()), s.get().toString());
+	}
+	
+	public final void warn(final String t, final Supplier<?> v) {
+		if (status && level > ERROR)write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v.get().toString());
 	}
 
 	public final void warn(final String s) {
@@ -101,12 +112,18 @@ public abstract class Logger implements AutoCloseable {
 		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 
+	
+	
 	public final void infoback(final String s) {
 		if (status && level > WARN) write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
 
-	public final void info(final Supplier<Object> s) {
-		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+	public final void info(final Supplier<?> s) {
+		if (status && level > WARN)write(this, sw.walk(f -> f.skip(1).findFirst().get()), s.get().toString());
+	}
+	
+	public final void info(final String t, final Supplier<?> v) {
+		if (status && level > WARN)write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v.get().toString());
 	}
 
 	public final void info(final String s) {
@@ -125,12 +142,18 @@ public abstract class Logger implements AutoCloseable {
 		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 
+	
+	
 	public final void debugback(final String s) {
 		if (status && level > INFO) write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
 
-	public final void debug(final Supplier<Object> s) {
-		if (status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+	public final void debug(final Supplier<?> s) {
+		if (status && level > INFO)write(this, sw.walk(f -> f.skip(1).findFirst().get()), s.get().toString());
+	}
+	
+	public final void debug(final String t, final Supplier<?> v) {
+		if (status && level > INFO)write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v.get().toString());
 	}
 
 	public final void debug(final String s) {
@@ -149,12 +172,18 @@ public abstract class Logger implements AutoCloseable {
 		if (status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 
+	
+	
 	public final void traceback(final String s) {
 		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
 
-	public final void trace(final Supplier<Object> s) {
-		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+	public final void trace(final Supplier<?> s) {
+		if (status && level > DEBUG)write(this, sw.walk(f -> f.skip(1).findFirst().get()), s.get().toString());
+	}
+	
+	public final void trace(final String t, final Supplier<?> v) {
+		if (status && level > DEBUG)write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v.get().toString());
 	}
 
 	public final void trace(final String s) {
@@ -181,23 +210,7 @@ public abstract class Logger implements AutoCloseable {
 			String ssb = sb.toString();
 			logger.write(ssb);
 			if (logc) writeConsole(ssb);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void write(Logger logger, StackFrame frame, Supplier<Object> s) {
-		try {
-			final StringBuilder sb = new StringBuilder(50);
-			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(frame.getDeclaringClass().getSimpleName()).append(".");
-			sb.append(frame.getMethodName()).append("(").append(frame.getLineNumber()).append(") ").append(s.get().toString()).append("\r\n");
-			String ssb = sb.toString();
-			logger.write(ssb);
-			if (logc) writeConsole(ssb);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		} catch (Exception e) {e.printStackTrace();}
 	}
 
 	private static final void write(final Logger logger, final StackFrame frame, final String t, final String v) {
@@ -208,11 +221,9 @@ public abstract class Logger implements AutoCloseable {
 			String ssb = sb.toString();
 			logger.write(ssb);
 			if (logc) writeConsole(ssb);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception e) {e.printStackTrace();}
 	}
-
+	
 	public final void activate(boolean status) {
 		this.status = status;
 	}
