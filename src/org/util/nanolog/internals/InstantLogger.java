@@ -9,15 +9,15 @@ import org.util.nanolog.Logger;
 public final class InstantLogger extends Logger {
 
 	private final Writer writer;
-	
+
 	public InstantLogger(LogWriter logWriter) {
 		this.writer = logWriter.getWriter();
 	}
-	
+
 	@Override
 	public final void write(final String s) {
 		try {
-			if(status) {
+			if (status) {
 				writer.write(s);
 				writer.flush();
 			}
@@ -25,7 +25,7 @@ public final class InstantLogger extends Logger {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public final void close() {
 		this.status = false;

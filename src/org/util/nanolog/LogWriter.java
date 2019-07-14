@@ -12,42 +12,40 @@ import org.util.nanolog.internals.NullWriter;
 public final class LogWriter {
 
 	protected static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-	
-	public final String root;
-	public final String name;
+
+	public final String  root;
+	public final String  name;
 	public final boolean isDaily;
-	private String writerName;
-	private LocalDate writerDate;
-	private Writer writer;
-	
+	private String       writerName;
+	private LocalDate    writerDate;
+	private Writer       writer;
+
 	public LogWriter(String root, String name, boolean isDaily) {
-		this.root = getRoot(root);
-		this.name = name;
+		this.root    = getRoot(root);
+		this.name    = name;
 		this.isDaily = isDaily;
 	}
-	
+
 	public final String getName() {
 		return name;
 	}
-	
+
 	public final boolean isIsDaily() {
 		return isDaily;
 	}
-	
-	
+
 	public final Writer getWriter() {
-		if(isDaily) {
+		if (isDaily) {
 			this.writerDate = LocalDate.now();
 			final String writerName = getDatedWriterName(this.root, this.name, writerDate);
-			if(writerName.equals(this.writerName)) return this.writer;
+			if (writerName.equals(this.writerName)) return this.writer;
 			else {
 				this.writerName = writerName;
-				this.writer = getFileWriter(this.writerName);
+				this.writer     = getFileWriter(this.writerName);
 				return this.writer;
 			}
-		}
-		else {
-			if(this.writer == null) {
+		} else {
+			if (this.writer == null) {
 				this.writerName = getWriterName(this.root, this.name);
 				return this.writer = getFileWriter(this.writerName);
 			}
@@ -57,18 +55,18 @@ public final class LogWriter {
 
 	public final Writer changeDate() {
 		Logger.console("*****************changing date.");
-		if(isDaily) {
+		if (isDaily) {
 			final String writerName = getDatedWriterName(this.root, this.name, writerDate.plusDays(1));
 			this.writerName = writerName;
 			final Writer oldWriter = this.writer;
 			this.writer = getFileWriter(this.writerName);
-			try(oldWriter){} catch (Exception e) {}
+			try (oldWriter) {} catch (Exception e) {}
 			return this.writer;
-			
+
 		}
 		return this.writer;
 	}
-	
+
 	private static final Writer getFileWriter(String name) {
 		try {
 			File file = new File(name);
@@ -82,17 +80,15 @@ public final class LogWriter {
 		}
 		return NullWriter.getInstance();
 	}
-	
-	
+
 	private static final String getRoot(final String root) {
 		if (root == null || "".equals(root)) return "";
 		else if (root.endsWith("/")) {
-			if(root.length() > 1) return root;
+			if (root.length() > 1) return root;
 			else return "";
-		}
-		else return root + "/";
+		} else return root + "/";
 	}
-	
+
 	private static final String getWriterName(final String root, final String name) {
 		return "logs/" + root + name + ".log";
 	}

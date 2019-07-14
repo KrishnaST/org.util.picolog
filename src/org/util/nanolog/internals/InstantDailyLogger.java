@@ -8,15 +8,15 @@ import org.util.nanolog.Logger;
 
 public final class InstantDailyLogger extends Logger implements DailyLogger {
 
-	private Writer writer;
+	private Writer          writer;
 	private final LogWriter logWriter;
-	
+
 	public InstantDailyLogger(LogWriter logWriter) {
 		this.logWriter = logWriter;
-		this.writer = logWriter.getWriter();
+		this.writer    = logWriter.getWriter();
 		daily_loggers.put(logWriter.getName(), this);
 	}
-	
+
 	@Override
 	public final void write(String s) {
 		try {
@@ -26,7 +26,7 @@ public final class InstantDailyLogger extends Logger implements DailyLogger {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public final void close() {
 		this.status = false;
@@ -34,7 +34,7 @@ public final class InstantDailyLogger extends Logger implements DailyLogger {
 			writer.close();
 		} catch (Exception e) {}
 	}
-	
+
 	@Override
 	public final void changeDate() {
 		System.out.println("changing log date");

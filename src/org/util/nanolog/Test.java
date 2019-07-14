@@ -7,7 +7,7 @@ public class Test {
 	public static void main(String[] args) {
 		Logger.scheduleDateChange(new ScheduledThreadPoolExecutor(1));
 		LogWriter logWriter = new LogWriter("SCB", "issuer", true);
-		Logger logger = Logger.getLogger(LoggerType.INSTANT, logWriter);
+		Logger    logger    = Logger.getLogger(LoggerType.INSTANT, logWriter);
 		for (int i = 0; i < 100; i++) {
 			logger.info("hi");
 			try {

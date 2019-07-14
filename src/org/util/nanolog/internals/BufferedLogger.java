@@ -10,31 +10,33 @@ import org.util.nanolog.Logger;
 public final class BufferedLogger extends Logger {
 
 	private final Writer writer;
-	
+
 	private final List<String> list = new ArrayList<>();
-	
+
 	public BufferedLogger(LogWriter logWriter) {
 		this.writer = logWriter.getWriter();
 	}
-	
+
 	@Override
 	public final void write(String s) {
-		if(super.status) list.add(s);
+		if (super.status) list.add(s);
 	}
-	
+
 	@Override
 	public final void close() {
 		super.status = false;
 		final StringBuilder sb = new StringBuilder(2000);
-		list.forEach(s-> sb.append(s));
+		list.forEach(s -> sb.append(s));
 		final String s = sb.toString();
-		try(writer) {
+		try (writer) {
 			synchronized (writer) {
 				writer.write(s);
 				writer.flush();
 			}
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		list.clear();
 	}
-	
+
 }

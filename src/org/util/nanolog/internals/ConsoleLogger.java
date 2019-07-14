@@ -5,9 +5,8 @@ import org.util.nanolog.Logger;
 public final class ConsoleLogger extends Logger implements Runnable {
 
 	@Override
-	protected final void write(String s) {
-	}
-	
+	protected final void write(String s) {}
+
 	@Override
 	public final void run() {
 		try {
