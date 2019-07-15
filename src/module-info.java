@@ -6,4 +6,9 @@
 module org.util.nanolog {
 
 	exports org.util.nanolog;
+
+	requires static transitive okhttp3;
+	requires static transitive okio;
+	requires static transitive kotlin.stdlib;
+	requires static transitive kotlin.stdlib.common;
 }
