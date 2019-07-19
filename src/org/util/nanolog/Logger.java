@@ -38,11 +38,11 @@ public abstract class Logger implements AutoCloseable {
 	private static final int INFO  = Level.INFO.value;
 	private static final int DEBUG = Level.DEBUG.value;
 
-	public static final Logger CONSOLE = new ConsoleLogger();
-
 	private final int level  = lvl;
 	protected boolean status = true;
 
+	public static final Logger CONSOLE = new ConsoleLogger();
+	
 	protected abstract void write(String s);
 
 	protected static final void writeConsole(String s) {
