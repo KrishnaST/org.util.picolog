@@ -333,8 +333,8 @@ public abstract class Logger implements AutoCloseable {
 	}
 
 	public static final long getEndOfDay() {
-		Date     date = new Date();
-		Calendar cal  = Calendar.getInstance();
+		final Date     date = new Date();
+		final Calendar cal  = Calendar.getInstance();
 		cal.setTime(date);
 		cal.set(Calendar.HOUR_OF_DAY, cal.getMaximum(Calendar.HOUR_OF_DAY));
 		cal.set(Calendar.MINUTE, cal.getMaximum(Calendar.MINUTE));
