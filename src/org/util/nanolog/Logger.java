@@ -29,7 +29,6 @@ public abstract class Logger implements AutoCloseable {
 	private static final StackWalker       sw         = StackWalker.getInstance(Set.of(Option.RETAIN_CLASS_REFERENCE), 2);
 	private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss:SSS");
 	private static final Writer            writer     = new FileWriter(FileDescriptor.out);
-	public static final Logger             CONSOLE    = new ConsoleLogger();
 
 	private static boolean logc = ConfigLoader.logConsole();
 	private static int     lvl  = ConfigLoader.getLevel().value;
@@ -38,6 +37,8 @@ public abstract class Logger implements AutoCloseable {
 	private static final int WARN  = Level.WARN.value;
 	private static final int INFO  = Level.INFO.value;
 	private static final int DEBUG = Level.DEBUG.value;
+
+	public static final Logger CONSOLE = new ConsoleLogger();
 
 	private final int level  = lvl;
 	protected boolean status = true;
@@ -53,6 +54,14 @@ public abstract class Logger implements AutoCloseable {
 		}
 	}
 
+	public final void log(final String s) {
+		if (status) write(this, s);
+	}
+	
+	public final void logtrace(final String s) {
+		if (status && level > DEBUG) write(this, s);
+	}
+	
 	public final void errorback(final String s) {
 		write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
@@ -245,6 +254,18 @@ public abstract class Logger implements AutoCloseable {
 		}
 	}
 
+	private static final void write(final Logger logger, final String s) {
+		try {
+			final StringBuilder sb = new StringBuilder(50);
+			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(s).append("\r\n");
+			String ssb = sb.toString();
+			logger.write(ssb);
+			if (logc) writeConsole(ssb);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static final void write(final Logger logger, final StackFrame frame, final String s) {
 		try {
 			final StringBuilder sb = new StringBuilder(50);
@@ -320,5 +341,13 @@ public abstract class Logger implements AutoCloseable {
 		cal.set(Calendar.SECOND, cal.getMaximum(Calendar.SECOND));
 		cal.set(Calendar.MILLISECOND, cal.getMaximum(Calendar.MILLISECOND));
 		return (cal.getTime().getTime() - date.getTime()) / 1000;
+	}
+
+	public static void main(String[] args) {
+		try {
+			Logger.CONSOLE.info("hi");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

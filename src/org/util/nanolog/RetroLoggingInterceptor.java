@@ -55,7 +55,7 @@ public final class RetroLoggingInterceptor implements Interceptor {
 	public Response intercept(Chain chain) throws IOException {
 		Logger logger = chain.request().tag(Logger.class);
 		if (logger == null) logger = Logger.CONSOLE;
-		Level level = this.level;
+		//Level level = this.level;
 
 		Request request = chain.request();
 		if (level == Level.NONE) { return chain.proceed(request); }
@@ -69,13 +69,13 @@ public final class RetroLoggingInterceptor implements Interceptor {
 		Connection connection          = chain.connection();
 		String     requestStartMessage = "--> " + request.method() + ' ' + request.url() + (connection != null ? " " + connection.protocol() : "");
 		if (!logHeaders && hasRequestBody) { requestStartMessage += " (" + requestBody.contentLength() + "-byte body)"; }
-		logger.info(requestStartMessage);
+		logger.log(requestStartMessage);
 
 		if (logHeaders) {
 			if (hasRequestBody) {
 
-				if (requestBody.contentType() != null) { logger.info("Content-Type: " + requestBody.contentType()); }
-				if (requestBody.contentLength() != -1) { logger.info("Content-Length: " + requestBody.contentLength()); }
+				if (requestBody.contentType() != null) { logger.log("Content-Type: " + requestBody.contentType()); }
+				if (requestBody.contentLength() != -1) { logger.log("Content-Length: " + requestBody.contentLength()); }
 			}
 
 			Headers headers = request.headers();
@@ -86,11 +86,11 @@ public final class RetroLoggingInterceptor implements Interceptor {
 			}
 
 			if (!logBody || !hasRequestBody) {
-				logger.info("--> END " + request.method());
+				logger.log("--> END " + request.method());
 			} else if (bodyHasUnknownEncoding(request.headers())) {
-				logger.info("--> END " + request.method() + " (encoded body omitted)");
+				logger.log("--> END " + request.method() + " (encoded body omitted)");
 			} else if (requestBody.isDuplex()) {
-				logger.info("--> END " + request.method() + " (duplex request body omitted)");
+				logger.log("--> END " + request.method() + " (duplex request body omitted)");
 			} else {
 				Buffer buffer = new Buffer();
 				requestBody.writeTo(buffer);
@@ -99,12 +99,12 @@ public final class RetroLoggingInterceptor implements Interceptor {
 				MediaType contentType = requestBody.contentType();
 				if (contentType != null) { charset = contentType.charset(UTF8); }
 
-				logger.info("");
+				logger.log("");
 				if (isPlaintext(buffer)) {
-					logger.info(buffer.readString(charset));
-					logger.info("--> END " + request.method() + " (" + requestBody.contentLength() + "-byte body)");
+					logger.log(buffer.readString(charset));
+					logger.log("--> END " + request.method() + " (" + requestBody.contentLength() + "-byte body)");
 				} else {
-					logger.info("--> END " + request.method() + " (binary " + requestBody.contentLength() + "-byte body omitted)");
+					logger.log("--> END " + request.method() + " (binary " + requestBody.contentLength() + "-byte body omitted)");
 				}
 			}
 		}
@@ -114,7 +114,7 @@ public final class RetroLoggingInterceptor implements Interceptor {
 		try {
 			response = chain.proceed(request);
 		} catch (Exception e) {
-			logger.info("<-- HTTP FAILED: " + e);
+			logger.log("<-- HTTP FAILED: " + e);
 			throw e;
 		}
 		long tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);
@@ -122,7 +122,7 @@ public final class RetroLoggingInterceptor implements Interceptor {
 		ResponseBody responseBody  = response.body();
 		long         contentLength = responseBody.contentLength();
 		String       bodySize      = contentLength != -1 ? contentLength + "-byte" : "unknown-length";
-		logger.info("<-- " + response.code() + (response.message().isEmpty() ? "" : ' ' + response.message()) + ' ' + response.request().url() + " (" + tookMs + "ms"
+		logger.log("<-- " + response.code() + (response.message().isEmpty() ? "" : ' ' + response.message()) + ' ' + response.request().url() + " (" + tookMs + "ms"
 				+ (!logHeaders ? ", " + bodySize + " body" : "") + ')');
 
 		if (logHeaders) {
@@ -130,9 +130,9 @@ public final class RetroLoggingInterceptor implements Interceptor {
 			for (int i = 0, count = headers.size(); i < count; i++) { logHeader(logger, headers, i); }
 
 			if (!logBody || !HttpHeaders.promisesBody(response)) {
-				logger.info("<-- END HTTP");
+				logger.log("<-- END HTTP");
 			} else if (bodyHasUnknownEncoding(response.headers())) {
-				logger.info("<-- END HTTP (encoded body omitted)");
+				logger.log("<-- END HTTP (encoded body omitted)");
 			} else {
 				BufferedSource source = responseBody.source();
 				source.request(Long.MAX_VALUE);
@@ -152,20 +152,20 @@ public final class RetroLoggingInterceptor implements Interceptor {
 				if (contentType != null) { charset = contentType.charset(UTF8); }
 
 				if (!isPlaintext(buffer)) {
-					logger.info("");
-					logger.info("<-- END HTTP (binary " + buffer.size() + "-byte body omitted)");
+					logger.log("");
+					logger.log("<-- END HTTP (binary " + buffer.size() + "-byte body omitted)");
 					return response;
 				}
 
 				if (contentLength != 0) {
-					logger.info("");
-					logger.info(buffer.clone().readString(charset));
+					logger.log("");
+					logger.log(buffer.clone().readString(charset));
 				}
 
 				if (gzippedLength != null) {
-					logger.info("<-- END HTTP (" + buffer.size() + "-byte, " + gzippedLength + "-gzipped-byte body)");
+					logger.log("<-- END HTTP (" + buffer.size() + "-byte, " + gzippedLength + "-gzipped-byte body)");
 				} else {
-					logger.info("<-- END HTTP (" + buffer.size() + "-byte body)");
+					logger.log("<-- END HTTP (" + buffer.size() + "-byte body)");
 				}
 			}
 		}
@@ -175,7 +175,7 @@ public final class RetroLoggingInterceptor implements Interceptor {
 
 	private void logHeader(final Logger logger, final Headers headers, final int i) {
 		String value = headersToRedact.contains(headers.name(i)) ? "██" : headers.value(i);
-		logger.info(headers.name(i) + ": " + value);
+		logger.log(headers.name(i) + ": " + value);
 	}
 
 	private static boolean isPlaintext(Buffer buffer) {
