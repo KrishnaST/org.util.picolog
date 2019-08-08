@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -324,12 +325,13 @@ public abstract class Logger implements AutoCloseable {
 		return "";
 	}
 
-	public static final void scheduleDateChange(final ScheduledExecutorService schedular) {
+	public static final ScheduledFuture<?> scheduleDateChange(final ScheduledExecutorService schedular) {
 		try {
-			schedular.scheduleAtFixedRate((ConsoleLogger) Logger.CONSOLE, getEndOfDay(), 24 * 60 * 60, TimeUnit.SECONDS);
+			return schedular.scheduleAtFixedRate((ConsoleLogger) Logger.CONSOLE, getEndOfDay(), 24 * 60 * 60, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	public static final long getEndOfDay() {
