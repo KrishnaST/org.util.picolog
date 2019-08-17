@@ -327,10 +327,12 @@ public abstract class Logger implements AutoCloseable {
 
 	public static final ScheduledFuture<?> scheduleDateChange(final ScheduledExecutorService schedular) {
 		try {
-			return schedular.scheduleAtFixedRate((ConsoleLogger) Logger.CONSOLE, getEndOfDay(), 24 * 60 * 60, TimeUnit.SECONDS);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			final ConsoleLogger CONSOLE = (ConsoleLogger) Logger.CONSOLE;
+			if(CONSOLE.scheduled) return null;
+			CONSOLE.scheduled = true;
+			return schedular.scheduleAtFixedRate(CONSOLE, getEndOfDay(), 24 * 60 * 60, TimeUnit.SECONDS);
+			
+		} catch (Exception e) {e.printStackTrace();}
 		return null;
 	}
 

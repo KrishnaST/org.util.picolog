@@ -4,6 +4,8 @@ import org.util.nanolog.Logger;
 
 public final class ConsoleLogger extends Logger implements Runnable {
 
+	public boolean scheduled = false;
+	
 	@Override
 	protected final void write(String s) {}
 
@@ -16,6 +18,10 @@ public final class ConsoleLogger extends Logger implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public final boolean isScheduled() {
+		return scheduled;
 	}
 
 }
