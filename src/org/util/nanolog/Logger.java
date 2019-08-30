@@ -22,6 +22,7 @@ import org.util.nanolog.internals.BufferedDailyLogger;
 import org.util.nanolog.internals.BufferedLogger;
 import org.util.nanolog.internals.ConfigLoader;
 import org.util.nanolog.internals.ConsoleLogger;
+import org.util.nanolog.internals.EncryptionProvider;
 import org.util.nanolog.internals.InstantDailyLogger;
 import org.util.nanolog.internals.InstantLogger;
 
@@ -63,6 +64,14 @@ public abstract class Logger implements AutoCloseable {
 		if (status && level > DEBUG) write(this, s);
 	}
 
+	public final void encrypt(final byte[] b) {
+		write(this, sw.walk(f -> f.skip(1).findFirst().get()), EncryptionProvider.encrypt(b));
+	}
+
+	public final void encrypt(final String t, final byte[] b) {
+		write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, EncryptionProvider.encrypt(b));
+	}
+	
 	public final void errorback(final String s) {
 		write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
@@ -91,10 +100,6 @@ public abstract class Logger implements AutoCloseable {
 		if (status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 
-	public final void warnback(final String s) {
-		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
-	}
-
 	public final void warn(final Supplier<?> s) {
 		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(s.get()));
 	}
@@ -119,10 +124,6 @@ public abstract class Logger implements AutoCloseable {
 		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
 
-	public final void infoback(final String s) {
-		if (status && level > WARN) write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
-	}
-
 	public final void info(final Supplier<?> s) {
 		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(s.get()));
 	}
@@ -145,10 +146,6 @@ public abstract class Logger implements AutoCloseable {
 
 	public final void info(final Exception e) {
 		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
-	}
-
-	public final void debugback(final String s) {
-		if (status && level > INFO) write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
 
 	public final void debug(final Supplier<?> s) {
@@ -202,7 +199,7 @@ public abstract class Logger implements AutoCloseable {
 	public final void trace(final Exception e) {
 		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
-
+	
 	public static final void consoleback(final String s) {
 		write(sw.walk(f -> f.skip(2).findFirst().get()), s);
 	}
@@ -230,6 +227,8 @@ public abstract class Logger implements AutoCloseable {
 	public static final void console(final Exception e) {
 		write(sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
 	}
+	
+	
 
 	private static final void write(final StackFrame frame, final String s) {
 		try {
@@ -279,7 +278,7 @@ public abstract class Logger implements AutoCloseable {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private static final void write(final Logger logger, final StackFrame frame, final String t, final String v) {
 		try {
 			final StringBuilder sb = new StringBuilder(50);
