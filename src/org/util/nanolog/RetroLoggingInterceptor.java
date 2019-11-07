@@ -24,13 +24,15 @@ import okio.GzipSource;
 public final class RetroLoggingInterceptor implements Interceptor {
 
 	private static final Charset UTF8  = Charset.forName("UTF-8");
-	private volatile Level       level = Level.NONE;
+	private volatile Level       level = Level.BASIC;
 
 	public enum Level {
 		NONE, BASIC, HEADERS, BODY
 	}
 
 	public RetroLoggingInterceptor() {}
+	
+	public RetroLoggingInterceptor(final Level level) {this.level = level;}
 
 	private volatile Set<String> headersToRedact = Collections.emptySet();
 

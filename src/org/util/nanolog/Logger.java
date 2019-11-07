@@ -6,13 +6,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.StackWalker.Option;
-import java.lang.StackWalker.StackFrame;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +25,6 @@ import org.util.nanolog.internals.InstantLogger;
 
 public abstract class Logger implements AutoCloseable {
 
-	private static final StackWalker       sw         = StackWalker.getInstance(Set.of(Option.RETAIN_CLASS_REFERENCE), 2);
 	private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss:SSS");
 	private static final Writer            writer     = new FileWriter(FileDescriptor.out);
 
@@ -65,175 +61,177 @@ public abstract class Logger implements AutoCloseable {
 	}
 
 	public final void encrypt(final byte[] b) {
-		write(this, sw.walk(f -> f.skip(1).findFirst().get()), EncryptionProvider.encrypt(b));
+		write(this, Thread.currentThread().getStackTrace()[2], EncryptionProvider.encrypt(b));
 	}
 
 	public final void encrypt(final String t, final byte[] b) {
-		write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, EncryptionProvider.encrypt(b));
+		write(this, Thread.currentThread().getStackTrace()[2], t, EncryptionProvider.encrypt(b));
 	}
 	
 	public final void errorback(final String s) {
-		write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
+		write(this, Thread.currentThread().getStackTrace()[3], s);
 	}
 
 	public final void error(final Supplier<?> s) {
-		write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(s.get()));
+		write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(s.get()));
 	}
 
 	public final void error(final String t, final Supplier<?> v) {
-		write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, String.valueOf(v.get()));
+		write(this, Thread.currentThread().getStackTrace()[2], t, String.valueOf(v.get()));
 	}
 
 	public final void error(final String s) {
-		if (status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if (status) write(this, Thread.currentThread().getStackTrace()[2], s);
 	}
 
 	public final void error(final String t, final String v) {
-		if (status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if (status) write(this, Thread.currentThread().getStackTrace()[2], t, v);
 	}
 
 	public final void error(final Object o) {
-		if (status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if (status) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(o));
 	}
 
 	public final void error(final Exception e) {
-		if (status) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if (status) write(this, Thread.currentThread().getStackTrace()[2], stackTraceToString(e));
 	}
 
 	public final void warn(final Supplier<?> s) {
-		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(s.get()));
+		if (status && level > ERROR) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(s.get()));
 	}
 
 	public final void warn(final String t, final Supplier<?> v) {
-		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, String.valueOf(v.get()));
+		if (status && level > ERROR) write(this, Thread.currentThread().getStackTrace()[2], t, String.valueOf(v.get()));
 	}
 
 	public final void warn(final String s) {
-		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if (status && level > ERROR) write(this, Thread.currentThread().getStackTrace()[2], s);
 	}
 
 	public final void warn(final String t, final String v) {
-		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if (status && level > ERROR) write(this, Thread.currentThread().getStackTrace()[2], t, v);
 	}
 
 	public final void warn(final Object o) {
-		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if (status && level > ERROR) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(o));
 	}
 
 	public final void warn(final Exception e) {
-		if (status && level > ERROR) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if (status && level > ERROR) write(this, Thread.currentThread().getStackTrace()[2], stackTraceToString(e));
 	}
 
 	public final void info(final Supplier<?> s) {
-		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(s.get()));
+		if (status && level > WARN) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(s.get()));
 	}
 
 	public final void info(final String t, final Supplier<?> v) {
-		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, String.valueOf(v.get()));
+		if (status && level > WARN) write(this, Thread.currentThread().getStackTrace()[2], t, String.valueOf(v.get()));
 	}
 
 	public final void info(final String s) {
-		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if (status && level > WARN) write(this, Thread.currentThread().getStackTrace()[2], s);
 	}
 
 	public final void info(final String t, final String v) {
-		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if (status && level > WARN) write(this, Thread.currentThread().getStackTrace()[2], t, v);
 	}
 
 	public final void info(final Object o) {
-		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if (status && level > WARN) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(o));
 	}
 
 	public final void info(final Exception e) {
-		if (status && level > WARN) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if (status && level > WARN) write(this, Thread.currentThread().getStackTrace()[2], stackTraceToString(e));
 	}
 
 	public final void debug(final Supplier<?> s) {
-		if (status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(s.get()));
+		if (status && level > INFO) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(s.get()));
 	}
 
 	public final void debug(final String t, final Supplier<?> v) {
-		if (status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, String.valueOf(v.get()));
+		if (status && level > INFO) write(this, Thread.currentThread().getStackTrace()[2], t, String.valueOf(v.get()));
 	}
 
 	public final void debug(final String s) {
-		if (status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if (status && level > INFO) write(this, Thread.currentThread().getStackTrace()[2], s);
 	}
 
 	public final void debug(final String t, final String v) {
-		if (status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if (status && level > INFO) write(this, Thread.currentThread().getStackTrace()[2], t, v);
 	}
 
 	public final void debug(final Object o) {
-		if (status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if (status && level > INFO) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(o));
 	}
 
 	public final void debug(final Exception e) {
-		if (status && level > INFO) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if (status && level > INFO) write(this, Thread.currentThread().getStackTrace()[2], stackTraceToString(e));
 	}
 
 	public final void traceback(final String s) {
-		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(2).findFirst().get()), s);
+		if (status && level > DEBUG) write(this, Thread.currentThread().getStackTrace()[3], s);
 	}
 
 	public final void trace(final Supplier<?> s) {
-		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(s.get()));
+		if (status && level > DEBUG) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(s.get()));
 	}
 
 	public final void trace(final String t, final Supplier<?> v) {
-		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, String.valueOf(v.get()));
+		if (status && level > DEBUG) write(this, Thread.currentThread().getStackTrace()[2], t, String.valueOf(v.get()));
 	}
 
 	public final void trace(final String s) {
-		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), s);
+		if (status && level > DEBUG) write(this, Thread.currentThread().getStackTrace()[2], s);
 	}
 
 	public final void trace(final String t, final String v) {
-		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		if (status && level > DEBUG) write(this, Thread.currentThread().getStackTrace()[2], t, v);
 	}
 
 	public final void trace(final Object o) {
-		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		if (status && level > DEBUG) write(this, Thread.currentThread().getStackTrace()[2], String.valueOf(o));
 	}
 
 	public final void trace(final Exception e) {
-		if (status && level > DEBUG) write(this, sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		if (status && level > DEBUG) write(this, Thread.currentThread().getStackTrace()[2], stackTraceToString(e));
 	}
 	
 	public static final void consoleback(final String s) {
-		write(sw.walk(f -> f.skip(2).findFirst().get()), s);
+		write(Thread.currentThread().getStackTrace()[3], s);
 	}
 
 	public static final void console(final Supplier<?> s) {
-		write(sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(s.get()));
+		write(Thread.currentThread().getStackTrace()[2], String.valueOf(s.get()));
 	}
 
 	public static final void console(final String t, final Supplier<?> v) {
-		write(sw.walk(f -> f.skip(1).findFirst().get()), t, String.valueOf(v.get()));
+		write(Thread.currentThread().getStackTrace()[2], t, String.valueOf(v.get()));
 	}
 
 	public static final void console(final String s) {
-		write(sw.walk(f -> f.skip(1).findFirst().get()), s);
+		write(Thread.currentThread().getStackTrace()[2], s);
 	}
 
 	public static final void console(final String t, final String v) {
-		write(sw.walk(f -> f.skip(1).findFirst().get()), t, v);
+		write(Thread.currentThread().getStackTrace()[2], t, v);
 	}
 
 	public static final void console(final Object o) {
-		write(sw.walk(f -> f.skip(1).findFirst().get()), String.valueOf(o));
+		write(Thread.currentThread().getStackTrace()[2], String.valueOf(o));
 	}
 
 	public static final void console(final Exception e) {
-		write(sw.walk(f -> f.skip(1).findFirst().get()), stackTraceToString(e));
+		write(Thread.currentThread().getStackTrace()[2], stackTraceToString(e));
 	}
 	
 	
 
-	private static final void write(final StackFrame frame, final String s) {
+	private static final void write(final StackTraceElement frame, final String s) {
 		try {
 			final StringBuilder sb = new StringBuilder(50);
-			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(frame.getDeclaringClass().getSimpleName()).append(".");
+			String cName = frame.getClassName();
+			String className = cName.substring(cName.lastIndexOf(".") + 1);
+			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(className).append(".");
 			sb.append(frame.getMethodName()).append("(").append(frame.getLineNumber()).append(") ").append(s).append("\r\n");
 			String ssb = sb.toString();
 			if (logc) writeConsole(ssb);
@@ -242,10 +240,12 @@ public abstract class Logger implements AutoCloseable {
 		}
 	}
 
-	private static final void write(final StackFrame frame, final String t, final String v) {
+	private static final void write(final StackTraceElement frame, final String t, final String v) {
 		try {
 			final StringBuilder sb = new StringBuilder(50);
-			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(frame.getDeclaringClass().getSimpleName()).append(".");
+			String cName = frame.getClassName();
+			String className = cName.substring(cName.lastIndexOf(".") + 1);
+			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append(className).append(".");
 			sb.append(frame.getMethodName()).append("(").append(frame.getLineNumber()).append(") ").append(t).append(" : ").append(v).append("\r\n");
 			String ssb = sb.toString();
 			if (logc) writeConsole(ssb);
@@ -266,10 +266,12 @@ public abstract class Logger implements AutoCloseable {
 		}
 	}
 
-	private static final void write(final Logger logger, final StackFrame frame, final String s) {
+	private static final void write(final Logger logger, final StackTraceElement frame, final String s) {
 		try {
 			final StringBuilder sb = new StringBuilder(50);
-			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append("[").append(Thread.currentThread().getId()).append("] ").append(frame.getDeclaringClass().getSimpleName()).append(".");
+			String cName = frame.getClassName();
+			String className = cName.substring(cName.lastIndexOf(".") + 1);
+			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append("[").append(Thread.currentThread().getId()).append("] ").append(className).append(".");
 			sb.append(frame.getMethodName()).append("(").append(frame.getLineNumber()).append(") ").append(s).append("\r\n");
 			String ssb = sb.toString();
 			logger.write(ssb);
@@ -279,10 +281,12 @@ public abstract class Logger implements AutoCloseable {
 		}
 	}
 	
-	private static final void write(final Logger logger, final StackFrame frame, final String t, final String v) {
+	private static final void write(final Logger logger, final StackTraceElement frame, final String t, final String v) {
 		try {
 			final StringBuilder sb = new StringBuilder(50);
-			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append("[").append(Thread.currentThread().getId()).append("] ").append(frame.getDeclaringClass().getSimpleName()).append(".");
+			String cName = frame.getClassName();
+			String className = cName.substring(cName.lastIndexOf(".") + 1);
+			sb.append("[").append(LocalDateTime.now().format(timeFormat)).append("] ").append("[").append(Thread.currentThread().getId()).append("] ").append(className).append(".");
 			sb.append(frame.getMethodName()).append("(").append(frame.getLineNumber()).append(") ").append(t).append(" : ").append(v).append("\r\n");
 			String ssb = sb.toString();
 			logger.write(ssb);
