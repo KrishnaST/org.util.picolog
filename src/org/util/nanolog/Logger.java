@@ -43,6 +43,7 @@ public abstract class Logger implements AutoCloseable {
 
 	protected abstract void write(String s);
 
+
 	protected static final void writeConsole(String s) {
 		try {
 			writer.write(s);
